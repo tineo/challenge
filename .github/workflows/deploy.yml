@@ -1,0 +1,32 @@
+name: Create Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Maven
+        uses: actions/setup-java@v2
+        with:
+          java-version: 17
+
+      - name: Build and package
+        run: mvn clean install
+
+      - name: Create release
+        uses: softprops/action-gh-release@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: v1.0.0
+          name: My Release
+          body: This is my first release!
+          draft: false
+          prerelease: false
+          files: target/challenge-0.0.1-SNAPSHOT.jar
