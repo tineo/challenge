@@ -35,6 +35,7 @@ jobs:
         run: mvn clean install
 
       - name: Build image, tag, and push image to Amazon ECR
+        id: build-image
         env:
           ECR_REGISTRY: ${{ secrets.ECR_URI }}
           ECR_REPOSITORY: challenge
@@ -42,12 +43,23 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-      - name: Run ECS task
-        uses: aws/aws-actions/run-ecs-task@v1
-        with:
-          cluster-name: mi-cluster-ecs
-          task-definition: mi-aplicacion
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: mi-contenedor
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: mi-servicio-ecs
+          cluster: mi-cluster-ecs
+          wait-for-service-stability: true
   create-release:
     runs-on: ubuntu-latest
 
