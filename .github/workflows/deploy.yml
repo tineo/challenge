@@ -85,12 +85,10 @@ jobs:
 
       - name: Build and package
         run: mvn clean install
-      - name: Configure authentication
-        run: |
-          gh auth login --with-token ${{ secrets.GH_TOKEN }}
-
-      - name: Deploy JAR to GitHub Packages
-        run: mvn deploy -Dgh-token=$GITHUB_TOKEN
+      - name: Publish package
+        run: mvn --batch-mode deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
