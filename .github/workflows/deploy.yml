@@ -90,6 +90,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       - name: Extract version and name from pom.xml
+        id: extract
         run: |
           version=$(grep -oP '(?<=<version>).*(?=<\/version>)' pom.xml | tail -n 1)
           version_number=${version%-SNAPSHOT}
