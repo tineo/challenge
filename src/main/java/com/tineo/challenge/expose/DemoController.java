@@ -8,7 +8,7 @@ public class DemoController {
 
     @RequestMapping("/")
     public String hello() {
-        return "Hola Mundo!";
+        return "Hola Mundo desde Github!";
     }
 
 }

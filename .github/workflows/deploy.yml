@@ -42,6 +42,13 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      - name: Run ECS task
+        uses: aws/aws-actions/run-ecs-task@v1
+        with:
+          cluster-name: mi-cluster-ecs
+          task-definition: mi-aplicacion
+          parameters:
+            env: production
 
 
   create-release:
