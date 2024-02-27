@@ -97,6 +97,11 @@ jobs:
           echo "::set-output name=VERSION::$version"
           echo "::set-output name=VERSION_NUMBER::version_number"
           echo "::set-output name=NAME::$name"
+      - name: Print extracted information
+        run: |
+          echo "Extracted version: ${{ steps.extract.outputs.VERSION }}"
+          echo "Extracted version_number: ${{ steps.extract.outputs.VERSION_NUMBER }}"
+          echo "Extracted name: ${{ steps.extract.outputs.NAME }}"
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
