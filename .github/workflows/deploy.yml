@@ -90,31 +90,14 @@ jobs:
         run: mvn --batch-mode deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-      - name: Extract version and name from pom.xml
-        id: extract
-        run: |
-          version=$(grep -oP '(?<=<version>).*(?=<\/version>)' pom.xml | tail -n 1)
-          version_number=${version%-SNAPSHOT}
-          name=$(grep -oP '(?<=<name>).*(?=<\/name>)' pom.xml | head -n 1)
-          echo "Extracted version: $version"
-          echo "Extracted version_number: {$version_number}"
-          echo "Extracted name: {$name}"
-          echo "{VERSION}={$version}" >> $GITHUB_OUTPUT
-          echo "{VERSION_NUMBER}={$version_number}" >> $GITHUB_OUTPUT
-          echo "{NAME}={$name}" >> $GITHUB_OUTPUT
-      - name: Print extracted information
-        run: |
-          echo "Extracted version: ${{ steps.extract.outputs.VERSION }}"
-          echo "Extracted version_number: ${{ steps.extract.outputs.VERSION_NUMBER }}"
-          echo "Extracted name: ${{ steps.extract.outputs.NAME }}"
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.GH_TOKEN }}
-          tag_name: ${{ steps.extract.outputs.VERSION_NUMBER }}
-          name: ${{ steps.extract.outputs.VERSION_NUMBER }}
-          body: deployed ${{ steps.extract.outputs.NAME }}-${{ steps.extract.outputs.VERSION_NUMBER }}
+          tag_name: $(grep -oP '(?<=<version>).*(?=<\/version>)' pom.xml | tail -n 1 | sed 's/-SNAPSHOT$//')
+          name: $(grep -oP '(?<=<version>).*(?=<\/version>)' pom.xml | tail -n 1 | sed 's/-SNAPSHOT$//')
+          body: deployed $(grep -oP '(?<=<name>).*(?=<\/name>)' pom.xml | head -n 1)-$(grep -oP '(?<=<version>).*(?=<\/version>)' pom.xml | tail -n 1)
           draft: false
           prerelease: false
-          files: target/${{ steps.extract.outputs.NAME }}-${{ steps.extract.outputs.VERSION }}.jar
+          files: target/$(grep -oP '(?<=<name>).*(?=<\/name>)' pom.xml | head -n 1)-$(grep -oP '(?<=<version>).*(?=<\/version>)' pom.xml | tail -n 1).jar
 
