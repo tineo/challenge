@@ -91,9 +91,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       - name: Extract version and name from pom.xml
         run: |
-          version=$(grep -oP '(?<=<version>).*(?=<\/version>)' pom.xml)
+          version=$(grep -oP '(?<=<version>).*(?=<\/version>)' pom.xml | tail -n 1)
           version_number=${version%-SNAPSHOT}
-          name=$(grep -oP '(?<=<name>).*(?=<\/name>)' pom.xml)
+          name=$(grep -oP '(?<=<name>).*(?=<\/name>)' pom.xml | head -n 1)
           echo "::set-output name=VERSION::$version"
           echo "::set-output name=VERSION_NUMBER::version_number"
           echo "::set-output name=NAME::$name"
