@@ -51,6 +51,7 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          echo "{image}={$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG}" >> $GITHUB_OUTPUT
     outputs:
       image: ${{ steps.build-image.outputs.image }}
   deploy-in-ecs:
@@ -66,7 +67,8 @@ jobs:
           aws-region: us-east-1
       - name: Download task definition
         run: |
-          echo "Extracted image: ${{ needs.build-and-push-image.outputs.image }}"
+          echo "Extracted image: ${{ jobs.build-and-push-image.outputs.image }}"
+          echo "Extracted image: ${{ steps.build-image.outputs.image }}"
           aws ecs describe-task-definition --task-definition mi-aplicacion --query taskDefinition > task-definition.json
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
