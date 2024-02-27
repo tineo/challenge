@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up Maven
         uses: actions/setup-java@v4
         with:
@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up Maven
         uses: actions/setup-java@v4
@@ -91,9 +91,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       - name: Extract version and name from pom.xml
         run: |
-          version=$(xmllint --xpath '/project/version/text()' pom.xml)
+          version=$(grep -oP '(?<=<version>).*(?=<\/version>)' pom.xml)
           version_number=${version%-SNAPSHOT}
-          name=$(xmllint --xpath '/project/name/text()' pom.xml)
+          name=$(grep -oP '(?<=<name>).*(?=<\/name>)' pom.xml)
           echo "::set-output name=VERSION::$version"
           echo "::set-output name=VERSION_NUMBER::version_number"
           echo "::set-output name=NAME::$name"
