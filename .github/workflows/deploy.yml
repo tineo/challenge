@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v2
+      - name: Setup Snyk to check for vulnerabilities
+        uses: snyk/actions/setup@master
       - name: Set up Maven
         uses: actions/setup-java@v4
         with:
@@ -30,8 +32,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.host.url=https://sonarcloud.io -Dsonar.projectKey=tineo_challenge -Dsonar.organization=tineo
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/maven-3-jdk-17@master
+
+      - name: Snyk monitor
+        run: snyk test
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
