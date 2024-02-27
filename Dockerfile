@@ -1,9 +1,9 @@
 FROM amazoncorretto:17.0.10-al2023-headless
-
+LABEL maintainer="Tineo"
 WORKDIR /app
 
-COPY target/challenge-0.0.1-SNAPSHOT.jar .
+COPY target/challenge-*.jar /opt/challenge.jar
 
-CMD ["java", "-jar", "challenge-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "/opt/challenge.jar"]
 
 EXPOSE 8080
