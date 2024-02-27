@@ -47,9 +47,6 @@ jobs:
         with:
           cluster-name: mi-cluster-ecs
           task-definition: mi-aplicacion
-          parameters:
-            env: production
-
 
   create-release:
     runs-on: ubuntu-latest
