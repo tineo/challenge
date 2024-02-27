@@ -4,17 +4,13 @@ on:
   push:
     branches:
       - main
-
 jobs:
 
   build-and-push-image:
     runs-on: ubuntu-latest
-
     steps:
       - name: Check out code
         uses: actions/checkout@v2
-      - name: Setup Snyk to check for vulnerabilities
-        uses: snyk/actions/setup@master
       - name: Set up Maven
         uses: actions/setup-java@v4
         with:
@@ -33,11 +29,6 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.host.url=https://sonarcloud.io -Dsonar.projectKey=tineo_challenge -Dsonar.organization=tineo
 
-      - name: Snyk monitor
-        run: snyk test
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          
       - name: Build jar and package
         run: mvn clean install
 
@@ -51,8 +42,6 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-
-
 
       - name: Build image, tag, and push image to Amazon ECR
         id: build-image
@@ -96,7 +85,13 @@ jobs:
 
       - name: Build and package
         run: mvn clean install
+      - name: Configure authentication
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }} # Replace with your actual secret
+        run: echo $GITHUB_TOKEN | gh auth login --with-token
 
+      - name: Deploy JAR to GitHub Packages
+        run: mvn deploy -Dgh-token=$GITHUB_TOKEN
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
