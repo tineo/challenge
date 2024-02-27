@@ -89,14 +89,22 @@ jobs:
         run: mvn --batch-mode deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      - name: Extract version and name from pom.xml
+        run: |
+          version=$(xmllint --xpath '/project/version/text()' pom.xml)
+          version_number=${version%-SNAPSHOT}
+          name=$(xmllint --xpath '/project/name/text()' pom.xml)
+          echo "::set-output name=VERSION::$version"
+          echo "::set-output name=VERSION_NUMBER::version_number"
+          echo "::set-output name=NAME::$name"
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.GH_TOKEN }}
-          tag_name: v1.0.0
-          name: My Release
-          body: This is my first release!
+          tag_name: ${{ steps.extract.outputs.VERSION_NUMBER }}
+          name: ${{ steps.extract.outputs.VERSION_NUMBER }}
+          body: deployed ${{ steps.extract.outputs.NAME }}-${{ steps.extract.outputs.VERSION_NUMBER }}
           draft: false
           prerelease: false
-          files: target/challenge-0.0.1-SNAPSHOT.jar
+          files: target/${{ steps.extract.outputs.NAME }}-${{ steps.extract.outputs.VERSION }}.jar
 
