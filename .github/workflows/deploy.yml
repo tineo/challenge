@@ -37,8 +37,7 @@ jobs:
         run: snyk test
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high
+          
       - name: Build jar and package
         run: mvn clean install
 
